@@ -3,18 +3,24 @@
 from pyrfc import *
 import datetime
 
+# BAPI calls log
+def print_log(bapi_return):
+    if len(bapi_return) > 0:
+        for line in bapi_return:
+            print '%s: %s' % (line['TYPE'], line['MESSAGE'])
+
 # Connect to ABAP system
 SAPROUTER = '/H/123.12.123.12/E/yt6ntx/H/123.14.131.111/H/'
 
 EC4 = {
-	'user'      : 'abapuser',
-	'passwd'    : 'abappass',
-        'ashost'    : '10.11.12.13',
-        'saprouter' : SAPROUTER,
-        'sysnr'     : '00',
-        'client'    : '300',
-        'trace'     : '3',
-        'lang'      : 'EN'}
+    'user'      : 'abapuser',
+    'passwd'    : 'abappass',
+    'ashost'    : '10.11.12.13',
+    'saprouter' : SAPROUTER,
+    'sysnr'     : '00',
+    'client'    : '300',
+    'trace'     : '3',
+    'lang'      : 'EN' }
 
 c = Connection(**EC4)
 
@@ -55,16 +61,24 @@ for uname_to in users:
         REF_USER    = r['REF_USER'],
         PARAMETER   = r['PARAMETER'],
         GROUPS      = r['GROUPS']
-     )
+    )
+
+    print_log(x['RETURN'])
 
     x = c.call('BAPI_USER_PROFILES_ASSIGN',
         USERNAME  = uname_to,
         PROFILES  = r['PROFILES']
     )
 
+    print_log(x['RETURN'])
+
     x = c.call('BAPI_USER_ACTGROUPS_ASSIGN',
         USERNAME       = uname_to,
         ACTIVITYGROUPS = r['ACTIVITYGROUPS']
     )
+
+    print_log(x['RETURN'])
+
 # Finished
-print uname_from, 'copied to', len(users), 'new users', '\nBye'
+print ("%s copied to %d new users\nBye!") % (uname_from, len(users))
+
